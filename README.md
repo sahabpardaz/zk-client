@@ -36,7 +36,7 @@ zkClient.addEphemeralNode(path, data);
 However, it is possible to go back to the curator style, by getting the underlying curator object from `ZkClient` instance:
 
 ```
-CuratorFramework curator = zkClient.getUnderlyingCurator()
+CuratorFramework curator = zkClient.getUnderlyingCurator();
 ```
 
 And this way you have access to the full feature list of curator.
