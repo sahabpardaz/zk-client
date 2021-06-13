@@ -23,7 +23,7 @@ It provides two useful methods:
 
 The operations are written in a more concise manner. For example the equivalent of curator call
 
-`‍‍‍‍‍‍‍‍‍``
+```
 curator.create().withMode(CreateMode.EPHEMERAL).forPath(path, data);
 ```
 
