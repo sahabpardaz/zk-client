@@ -16,12 +16,12 @@ public abstract class DefensiveChildrenCacheListener implements PathChildrenCach
 
     private static final Logger logger = LoggerFactory.getLogger(DefensiveChildrenCacheListener.class);
 
+    @SuppressWarnings("java:S1181")
     @Override
     public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
         try {
             onChildEvent(client, event);
         } catch (Throwable t) {
-            t.printStackTrace();
             logger.error("Crashed because of: ", t);
             System.exit(1);
         }

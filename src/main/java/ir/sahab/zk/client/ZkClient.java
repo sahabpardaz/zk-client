@@ -86,8 +86,7 @@ public class ZkClient implements ConnectionStateListener, Closeable {
      * @throws InterruptedException If interrupted before connection established.
      */
     public void start(String serverAddresses, int connectionTimeoutMillis, int sessionTimeoutMillis,
-            int numRetriesForFailedZkOps, int sleepBetweenRetriesMillis)
-            throws InterruptedException {
+            int numRetriesForFailedZkOps, int sleepBetweenRetriesMillis) throws InterruptedException {
         RetryPolicy retryPolicy = new RetryNTimes(numRetriesForFailedZkOps,
                 sleepBetweenRetriesMillis);
         curator = CuratorFrameworkFactory.newClient(serverAddresses, sessionTimeoutMillis,
@@ -193,8 +192,7 @@ public class ZkClient implements ConnectionStateListener, Closeable {
      * @throws ZkClientException If can not get children of the ZK node and the error condition is not retry-able or all
      *     retries failed.
      */
-    public List<String> getChildren(String path)
-            throws ZkClientException, InterruptedException {
+    public List<String> getChildren(String path) throws ZkClientException, InterruptedException {
         try {
             return curator.getChildren().forPath(path);
         } catch (InterruptedException ex) {
@@ -259,11 +257,12 @@ public class ZkClient implements ConnectionStateListener, Closeable {
      * @param data data of the ZK node. It can be null.
      * @throws ZkClientException If can not add ZK node and the error condition is not retry-able or all retries failed.
      */
-    public void addEphemeralNode(String path, byte[] data)
-            throws ZkClientException, InterruptedException {
+    public void addEphemeralNode(String path, byte[] data) throws ZkClientException, InterruptedException {
         try {
             curator.create().withMode(CreateMode.EPHEMERAL).forPath(path, data);
-            logger.debug("Ephemeral ZK node {} added to ZK.", path);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Ephemeral ZK node {} added to ZK.", path);
+            }
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -288,13 +287,14 @@ public class ZkClient implements ConnectionStateListener, Closeable {
             pathPrefix = joinPaths(parentPath, namePrefix);
             String path = curator.create().withMode(CreateMode.PERSISTENT_SEQUENTIAL)
                     .forPath(pathPrefix, data);
-            logger.debug("Sequentially named node {} added to ZK.", path);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Sequentially named node {} added to ZK.", path);
+            }
             return ZKPaths.getNodeFromPath(path);
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new ZkClientException("Failed to add a sequentially named child on: "
-                    + pathPrefix, ex);
+            throw new ZkClientException("Failed to add a sequentially named child on: " + pathPrefix, ex);
         }
     }
 
@@ -314,7 +314,9 @@ public class ZkClient implements ConnectionStateListener, Closeable {
             } else {
                 curator.create().withMode(CreateMode.PERSISTENT).forPath(path, data);
             }
-            logger.debug("Persistent node {} added to ZK.", path);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Persistent node {} added to ZK.", path);
+            }
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -329,8 +331,7 @@ public class ZkClient implements ConnectionStateListener, Closeable {
      * @param data data of the ZK node. It can be null.
      * @throws ZkClientException If can not add ZK node and the error condition is not retry-able or all retries failed.
      */
-    public void addPersistentNode(String path, byte[] data)
-            throws ZkClientException, InterruptedException {
+    public void addPersistentNode(String path, byte[] data) throws ZkClientException, InterruptedException {
         addPersistentNode(path, data, false);
     }
 
@@ -354,8 +355,7 @@ public class ZkClient implements ConnectionStateListener, Closeable {
      * @param data data of the ZK node. It can be null.
      * @throws ZkClientException If can not add ZK node and the error condition is not retry-able or all retries failed.
      */
-    public void addPersistentNode(String path, String data)
-            throws ZkClientException, InterruptedException {
+    public void addPersistentNode(String path, String data) throws ZkClientException, InterruptedException {
         addPersistentNode(path, data, false);
     }
 
@@ -376,8 +376,7 @@ public class ZkClient implements ConnectionStateListener, Closeable {
      * @param data an integer value to put in the created ZK node.
      * @throws ZkClientException If can not add ZK node and the error condition is not retry-able or all retries failed.
      */
-    public void addPersistentNode(String path, int data)
-            throws ZkClientException, InterruptedException {
+    public void addPersistentNode(String path, int data) throws ZkClientException, InterruptedException {
         addPersistentNode(path, String.valueOf(data), false);
     }
 
@@ -388,8 +387,7 @@ public class ZkClient implements ConnectionStateListener, Closeable {
      * @param data a long value to put in the created ZK node.
      * @throws ZkClientException If can not add ZK node and the error condition is not retry-able or all retries failed.
      */
-    public void addPersistentNode(String path, long data) throws ZkClientException,
-            InterruptedException {
+    public void addPersistentNode(String path, long data) throws ZkClientException, InterruptedException {
         addPersistentNode(path, String.valueOf(data), false);
     }
 
@@ -400,8 +398,7 @@ public class ZkClient implements ConnectionStateListener, Closeable {
      * @param data a boolean value to put in the created ZK node.
      * @throws ZkClientException If can not add ZK node and the error condition is not retry-able or all retries failed.
      */
-    public void addPersistentNode(String path, boolean data)
-            throws ZkClientException, InterruptedException {
+    public void addPersistentNode(String path, boolean data) throws ZkClientException, InterruptedException {
         addPersistentNode(path, String.valueOf(data));
     }
 
@@ -486,15 +483,16 @@ public class ZkClient implements ConnectionStateListener, Closeable {
      * @throws ZkClientException If can not remove ZK node and the error condition is not retry-able or all retries
      *     failed.
      */
-    public void remove(String path, boolean deletingChildrenIfNeeded)
-            throws ZkClientException, InterruptedException {
+    public void remove(String path, boolean deletingChildrenIfNeeded) throws ZkClientException, InterruptedException {
         try {
             if (deletingChildrenIfNeeded) {
                 curator.delete().deletingChildrenIfNeeded().forPath(path);
             } else {
                 curator.delete().forPath(path);
             }
-            logger.debug("Node {} removed from ZK.", path);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Node {} removed from ZK.", path);
+            }
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -540,7 +538,9 @@ public class ZkClient implements ConnectionStateListener, Closeable {
                 transaction = transaction.delete().forPath(path).and();
             }
             transaction.commit();
-            logger.debug("ZK nodes {} replaced by {}", Arrays.toString(oldPaths), newPath);
+            if (logger.isDebugEnabled()) {
+                logger.debug("ZK nodes {} replaced by {}", Arrays.toString(oldPaths), newPath);
+            }
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -559,8 +559,7 @@ public class ZkClient implements ConnectionStateListener, Closeable {
      * @throws ZkClientException If can not get the ZK node and the error condition is not retry-able or all retries
      *     failed.
      */
-    public byte[] move(String sourcePath, String destPath)
-            throws ZkClientException, InterruptedException {
+    public byte[] move(String sourcePath, String destPath) throws ZkClientException, InterruptedException {
         byte[] data;
         try {
             data = curator.getData().forPath(sourcePath);
@@ -568,7 +567,9 @@ public class ZkClient implements ConnectionStateListener, Closeable {
                     .delete().forPath(sourcePath)
                     .and().create().forPath(destPath, data)
                     .and().commit();
-            logger.debug("ZK Node {} moved to {}.", sourcePath, destPath);
+            if (logger.isDebugEnabled()) {
+                logger.debug("ZK Node {} moved to {}.", sourcePath, destPath);
+            }
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -625,14 +626,7 @@ public class ZkClient implements ConnectionStateListener, Closeable {
                 for (String child : children) {
                     String sourceChild = joinPaths(node.getLeft(), child);
                     String targetChild = joinPaths(node.getRight(), child);
-                    try {
-                        curatorTransactionBridge.and().create()
-                                .forPath(targetChild, getData(sourceChild));
-                    } catch (InterruptedException ex) {
-                        throw ex;
-                    } catch (Exception e) {
-                        throw new ZkClientException("Failed to add " + targetChild + " to transaction.", e);
-                    }
+                    curatorTransactionBridge.and().create().forPath(targetChild, getData(sourceChild));
                     queue.add(Pair.of(sourceChild, targetChild));
                 }
             }
@@ -759,9 +753,7 @@ public class ZkClient implements ConnectionStateListener, Closeable {
             if (sp.endsWith("/")) {
                 sp = sp.substring(0, sp.length() - 1);
             }
-            if (i == 0 && sp.isEmpty()) {
-                continue;
-            } else {
+            if (i != 0 || !sp.isEmpty()) {
                 pathList.add(sp);
             }
         }

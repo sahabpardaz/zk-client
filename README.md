@@ -1,6 +1,12 @@
 # Zookeeper Client
 [![Tests](https://github.com/sahabpardaz/zk-client/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/sahabpardaz/zk-client/actions/workflows/maven.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_zk-client&metric=coverage)](https://sonarcloud.io/dashboard?id=sahabpardaz_zk-client)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_zk-client&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=sahabpardaz_zk-client)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_zk-client&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=sahabpardaz_zk-client)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_zk-client&metric=security_rating)](https://sonarcloud.io/dashboard?id=sahabpardaz_zk-client)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_zk-client&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=sahabpardaz_zk-client)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_zk-client&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=sahabpardaz_zk-client)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_zk-client&metric=sqale_index)](https://sonarcloud.io/dashboard?id=sahabpardaz_zk-client)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_zk-client&metric=alert_status)](https://sonarcloud.io/dashboard?id=sahabpardaz_zk-client)
 [![JitPack](https://jitpack.io/v/sahabpardaz/zk-client.svg)](https://jitpack.io/#sahabpardaz/zk-client)
 
