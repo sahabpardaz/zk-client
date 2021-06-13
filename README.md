@@ -22,7 +22,15 @@ It provides two useful methods:
 ## Concise Operation Calls
 
 The operations are written in a more concise manner. For example the equivalent of curator call
-`curator.create().withMode(CreateMode.EPHEMERAL).forPath(path, data);` is
-`zkClient.addEphemeralNode(path, data);`.
+`‍‍‍‍‍‍‍‍‍``
+curator.create().withMode(CreateMode.EPHEMERAL).forPath(path, data);
+```
+is:
+```
+zkClient.addEphemeralNode(path, data);
+```
 However, it is possible to go back to the curator style, by getting the underlying curator object from `ZkClient` instance:
-`zkClient.getUnderlyingCurator()`, and this way you have access to the full feature list of curator.
+```
+CuratorFramework curator = zkClient.getUnderlyingCurator()
+```
+And this way you have access to the full feature list of curator.
