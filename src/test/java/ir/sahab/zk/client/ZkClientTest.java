@@ -51,18 +51,25 @@ public class ZkClientTest {
     }
 
     @Test
-    public void testOperations() throws Exception {
-        // Check node existence
+    public void testNodeExistence() throws ZkClientException, InterruptedException {
         String path = ROOT_PATH + "/node";
         assertFalse(zkClient.exists(path));
+        zkClient.addPersistentNode(path, "data", true);
+        assertTrue(zkClient.exists(path));
+    }
 
-        // Check adding a persistent node
+    @Test
+    public void testAddPersistentNode() throws ZkClientException, InterruptedException {
+        String path = ROOT_PATH + "/node";
         zkClient.addPersistentNode(path, "data", true);
         assertTrue(zkClient.exists(path));
         assertEquals("data", zkClient.getDataAsString(path));
+    }
 
-        // Check getting data with different types
-        zkClient.addPersistentNode(path + "/1", "data".getBytes());
+    @Test
+    public void testGetData() throws ZkClientException, InterruptedException {
+        String path = ROOT_PATH + "/node";
+        zkClient.addPersistentNode(path + "/1", "data".getBytes(), true);
         assertEquals("data", zkClient.getDataAsString(path + "/1"));
         zkClient.addPersistentNode(path + "/2", 110);
         assertEquals(110, zkClient.getDataAsInteger(path + "/2"));
@@ -70,12 +77,40 @@ public class ZkClientTest {
         assertEquals(111L, zkClient.getDataAsLong(path + "/3"));
         zkClient.addPersistentNode(path + "/4", true);
         assertTrue(zkClient.getDataAsBoolean(path + "/4"));
+    }
 
-        // Check adding an ephemeral node
-        zkClient.addEphemeralNode(path + "/1" + "/e-node", "data".getBytes());
-        assertTrue(zkClient.exists(path + "/1" + "/e-node"));
+    @Test
+    public void testSetData() throws ZkClientException, InterruptedException {
+        String path = ROOT_PATH + "/node";
+        zkClient.addPersistentNode(path, "data", true);
+        zkClient.setData(path, "updatedData");
+        assertEquals("updatedData", zkClient.getDataAsString(path));
+        zkClient.setData(path, 110);
+        assertEquals(110, zkClient.getDataAsInteger(path));
+        zkClient.setData(path, 111L);
+        assertEquals(111L, zkClient.getDataAsLong(path));
+        zkClient.setData(path, "true");
+        assertTrue(zkClient.getDataAsBoolean(path));
 
+    }
+
+    @Test
+    public void testAddEphemeralNode() throws ZkClientException, InterruptedException {
+        String path = ROOT_PATH + "/node";
+        zkClient.addPersistentNode(path, "data", true);
+        zkClient.addEphemeralNode(path + "/e-node", "data".getBytes());
+        assertTrue(zkClient.exists(path + "/e-node"));
+    }
+
+    @Test
+    public void testChildrenInfo() throws ZkClientException, InterruptedException {
         // Check children of a node
+        String path = ROOT_PATH + "/node";
+        zkClient.addPersistentNode(path + "/1", "data".getBytes(), true);
+        zkClient.addEphemeralNode(path + "/1/e-node", "data".getBytes());
+        zkClient.addPersistentNode(path + "/2", "data".getBytes());
+        zkClient.addPersistentNode(path + "/3", "data".getBytes());
+        zkClient.addPersistentNode(path + "/4", "data".getBytes());
         List<String> children = zkClient.getChildren(path);
         assertEquals(4, children.size());
         assertEquals(Arrays.asList("1", "2", "3", "4"), children);
@@ -92,32 +127,38 @@ public class ZkClientTest {
         List<String> expectedNodes = Arrays
                 .asList(path, path + "/1", path + "/1/e-node", path + "/2", path + "/3", path + "/4");
         assertTrue(subPaths.containsAll(expectedNodes) && expectedNodes.containsAll(subPaths));
+    }
 
-        // Check updating a node's data
-        zkClient.setData(path, "updatedData");
-        assertEquals("updatedData", zkClient.getDataAsString(path));
-        zkClient.setData(path, 110);
-        assertEquals(110, zkClient.getDataAsInteger(path));
-        zkClient.setData(path, 111L);
-        assertEquals(111L, zkClient.getDataAsLong(path));
-        zkClient.setData(path, "true");
-        assertTrue(zkClient.getDataAsBoolean(path));
+    @Test
+    public void testReplaceNodes() throws ZkClientException, InterruptedException {
+        String path = ROOT_PATH + "/node";
+        zkClient.addPersistentNode(path + "/1", "data", true);
+        zkClient.replace(new String[] {path + "/1"}, path + "/new-node1", "new-data".getBytes(), false);
+        assertFalse(zkClient.exists(path + "/1"));
+        assertTrue(zkClient.exists(path + "/new-node1"));
+        assertEquals("new-data", zkClient.getDataAsString(path + "/new-node1"));
+    }
 
-        // Check replacing a node
-        zkClient.replace(new String[] {path + "/3"}, path + "/new-node3", "new-data".getBytes(), false);
-        assertFalse(zkClient.exists(path + "/3"));
-        assertTrue(zkClient.exists(path + "/new-node3"));
-        assertEquals("new-data", zkClient.getDataAsString(path + "/new-node3"));
+    @Test
+    public void testMoveNode() throws ZkClientException, InterruptedException {
+        String path = ROOT_PATH + "/node";
+        zkClient.addPersistentNode(path + "/1", "true", true);
+        zkClient.move(path + "/1", path + "/new-node1");
+        assertFalse(zkClient.exists(path + "/1"));
+        assertTrue(zkClient.exists(path + "/new-node1"));
+        assertTrue(zkClient.getDataAsBoolean(path + "/new-node1"));
+    }
 
-        // Check moving a node
-        zkClient.move(path + "/4", path + "/new-node4");
-        assertFalse(zkClient.exists(path + "/4"));
-        assertTrue(zkClient.exists(path + "/new-node4"));
-        assertTrue(zkClient.getDataAsBoolean(path + "/new-node4"));
+    @Test
+    public void testRemoveNodes() throws ZkClientException, InterruptedException {
+        String path = ROOT_PATH + "/node";
+        zkClient.addPersistentNode(path + "/1", "data", true);
+        zkClient.addPersistentNode(path + "/2", "data", true);
+        zkClient.addPersistentNode(path + "/3", "data", true);
 
         // Check removing a node
-        zkClient.remove(path + "/2");
-        assertFalse(zkClient.exists(path + "/2"));
+        zkClient.remove(path + "/1");
+        assertFalse(zkClient.exists(path + "/1"));
 
         // Check removing all children of a parent node
         zkClient.removeChildren(path);
@@ -130,17 +171,22 @@ public class ZkClientTest {
         assertFalse(zkClient.exists(path));
         assertFalse(zkClient.exists(path + "/1"));
         assertFalse(zkClient.exists(path + "/2"));
+    }
 
-        // Check cloning a parent node with its children (deep clone)
+    @Test
+    public void testDeepCloneNodes() throws ZkClientException, InterruptedException {
+        String path = ROOT_PATH + "/node";
+        zkClient.addPersistentNode(path, "data", true);
         zkClient.addPersistentNode(path + "/1", "data", true);
         zkClient.addPersistentNode(path + "/2", "data");
         zkClient.addPersistentNode(path + "/2/3", "data");
+
         String clonePath = ROOT_PATH + "/new-node";
         zkClient.clone(path, clonePath);
         zkClient.exists(clonePath);
-        subPaths = zkClient.getSubPaths(clonePath);
+        List<String> subPaths = zkClient.getSubPaths(clonePath);
         assertEquals(4, subPaths.size());
-        expectedNodes = Arrays.asList(clonePath, clonePath + "/1", clonePath + "/2", clonePath + "/2/3");
+        List<String> expectedNodes = Arrays.asList(clonePath, clonePath + "/1", clonePath + "/2", clonePath + "/2/3");
         assertTrue(subPaths.containsAll(expectedNodes) && expectedNodes.containsAll(subPaths));
     }
 
@@ -182,7 +228,7 @@ public class ZkClientTest {
     @Test(expected = ZkClientException.class)
     public void testMoveToExistingNode() throws ZkClientException, InterruptedException {
         zkClient.addPersistentNode(ROOT_PATH + "/node-1", "data", true);
-        zkClient.addPersistentNode(ROOT_PATH + "/node-2", "data", true);
+        zkClient.addPersistentNode(ROOT_PATH + "/node-2");
         zkClient.move(ROOT_PATH + "/node-2", ROOT_PATH + "/node-1");
     }
 
