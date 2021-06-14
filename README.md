@@ -1,5 +1,5 @@
 # Zookeeper Client
-[![Tests](https://github.com/sahabpardaz/zk-client/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/sahabpardaz/zk-client/actions/workflows/maven.yml)
+[![Tests](https://github.com/sahabpardaz/zk-client/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/sahabpardaz/zk-client/actions/workflows/maven.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_zk-client&metric=coverage)](https://sonarcloud.io/dashboard?id=sahabpardaz_zk-client)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_zk-client&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=sahabpardaz_zk-client)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_zk-client&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=sahabpardaz_zk-client)
