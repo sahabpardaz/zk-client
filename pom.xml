@@ -5,7 +5,7 @@
 
     <groupId>ir.sahab</groupId>
     <artifactId>zk-client</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <description>This is a client library for ZooKeeper. In fact it is a thin wrapper around curator that provides
         concise method calls with checked exceptions.
     </description>

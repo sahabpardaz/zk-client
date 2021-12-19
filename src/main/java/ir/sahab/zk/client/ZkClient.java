@@ -308,6 +308,14 @@ public class ZkClient implements ConnectionStateListener, Closeable {
      */
     public void addPersistentNode(String path, byte[] data, boolean createParent)
             throws ZkClientException, InterruptedException {
+        // There is a corner case where Curator throws a ConnectionLoss but actually we added
+        // the ZK node. In order to be sure that the logic used for the exceptional case is correct,
+        // it is necessary to first check the existence of the path and if it exists, skip the rest
+        // of the operations.
+        if (exists(path)) {
+            throw new ZkClientException("Failed to add ZK node because node exists: path = " + path);
+        }
+
         try {
             if (createParent) {
                 curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(path, data);
@@ -320,7 +328,14 @@ public class ZkClient implements ConnectionStateListener, Closeable {
         } catch (InterruptedException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new ZkClientException("Failed to add a persistent ZK node in path: " + path, ex);
+            // There is a corner case where Curator throws a ConnectionLoss but actually we added
+            // the ZK node, so when we retry we get NodeExists exception. In here, we check whether
+            // node created or not and ignore error if exists.
+            if (exists(path) && Arrays.equals(getData(path), data)) {
+                logger.warn("Retrieve error in creating ZK path but node created anyway: path = {}", path);
+            } else {
+                throw new ZkClientException("Failed to add a persistent ZK node: path = {}" + path);
+            }
         }
     }
 
