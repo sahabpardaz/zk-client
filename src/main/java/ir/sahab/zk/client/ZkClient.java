@@ -313,7 +313,8 @@ public class ZkClient implements ConnectionStateListener, Closeable {
         // it is necessary to first check the existence of the path and if it exists, skip the rest
         // of the operations.
         if (exists(path)) {
-            throw new ZkClientException("Failed to add ZK node because node exists: " + path);
+            throw new ZkClientException("Failed to add ZK node because node exists: " + path,
+                    KeeperException.create(Code.NODEEXISTS, path));
         }
 
         try {

@@ -9,9 +9,11 @@ import ir.sahab.zookeeperrule.ZooKeeperRule;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.data.Stat;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -64,6 +66,21 @@ public class ZkClientTest {
         zkClient.addPersistentNode(path, "data", true);
         assertTrue(zkClient.exists(path));
         assertEquals("data", zkClient.getDataAsString(path));
+    }
+
+    @Test
+    public void testAddDuplicateNode() throws ZkClientException, InterruptedException {
+        String path = ROOT_PATH + "/node";
+        zkClient.addPersistentNode(path, "data", true);
+        assertTrue(zkClient.exists(path));
+        assertEquals("data", zkClient.getDataAsString(path));
+
+        try {
+            zkClient.addPersistentNode(path, "data", true);
+            Assert.fail();
+        } catch (ZkClientException e) {
+            assertEquals(Code.NODEEXISTS, e.getZkErrorCode());
+        }
     }
 
     @Test
